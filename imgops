@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+HACKSAW_REGION=`hacksaw -c EF0000`
+IMGOPS_LOOKUP_FILE=/tmp/imgops-lookup.png
+shotgun -g $HACKSAW_REGION -f png $IMGOPS_LOOKUP_FILE
+
+# Resize image for faster upload
+magick $IMGOPS_LOOKUP_FILE -resize 50% $IMGOPS_LOOKUP_FILE
+
+# Upload to 0x0.st, if successful then open in default browser
+GET_LINK=$(curl -F"file=@$IMGOPS_LOOKUP_FILE" 0x0.st -fs) && \
+    xdg-open "https://imgops.com/$GET_LINK"
+
+# Remove imgops lookup file if exists
+[[ -f $IMGOPS_LOOKUP_FILE ]] && \
+    rm $IMGOPS_LOOKUP_FILE

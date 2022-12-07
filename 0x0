@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Location of cache file
+ST_CACHE=~/.cache/0x0.st_history
+if ! [ -f $ST_CACHE ]; then touch $ST_CACHE; fi
+
+# If invoking list then only display list then exit
+if [ "$1" == "--list" ] || [ "$1" == "-l" ]; then
+   bat $ST_CACHE; exit 1
+fi
+
+# Upload to 0x0 and append to archive
+UPLOAD_FILE="$1"
+(( ${#UPLOAD_FILE} > 1 )) && {
+   LINK=$(curl -F"file=@$1" https://0x0.st -fs)
+   rg $LINK $ST_CACHE > /dev/null && {
+      # If file has already been uploaded then print and exit
+      printf "$LINK\n"; exit 1
+    } ||  {
+      # If file is newly uploaded than append to history file
+      printf "$(date +"%F_%H:%M:%S") $LINK $(basename "$UPLOAD_FILE")\n" >> $ST_CACHE
+      printf "$LINK\n"; exit 1
+    }
+} || {
+   printf "ERROR: No file given\n"; exit 1
+}

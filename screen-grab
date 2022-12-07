@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+FILE=/tmp/tmp-screenshot.png
+escrotum -s $FILE && {
+    feh -. $FILE; rm $FILE
+} || {
+    dunstify "ERROR: $0 failed to launch"
+}
